@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS references (
+  id SERIAL PRIMARY KEY,
+  stars INTEGER NOT NULL,
+  text TEXT NOT NULL,
+  location VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  date TIMESTAMP NOT NULL,
+  approved BOOLEAN DEFAULT false
+); 
