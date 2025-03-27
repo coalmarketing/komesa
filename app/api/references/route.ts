@@ -52,6 +52,14 @@ function validateReference(data: any): { isValid: boolean; errors: string[] } {
 export async function GET() {
   console.log('Public: Začátek načítání referencí');
   try {
+    if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_NAME) {
+      console.error('Public: Chybí databázové proměnné prostředí');
+      return NextResponse.json(
+        { error: 'Chybí konfigurace databáze' },
+        { status: 500 }
+      );
+    }
+
     console.log('Public: Získávání připojení k databázi');
     const connection = await pool.getConnection();
     try {
@@ -72,21 +80,21 @@ export async function GET() {
       return NextResponse.json(rows);
     } catch (error) {
       console.error('Public: Chyba při SQL dotazu:', error);
-      throw error;
+      return NextResponse.json(
+        { error: `Chyba při SQL dotazu: ${error instanceof Error ? error.message : 'Neznámá chyba'}` },
+        { status: 500 }
+      );
     } finally {
       console.log('Public: Uvolňování připojení');
       connection.release();
     }
   } catch (error) {
     console.error('Public: Chyba při načítání referencí:', error);
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: `Chyba při načítání referencí: ${error.message}` },
-        { status: 500 }
-      );
-    }
     return NextResponse.json(
-      { error: 'Chyba při načítání referencí' },
+      { 
+        error: `Chyba při připojení k databázi: ${error instanceof Error ? error.message : 'Neznámá chyba'}`,
+        details: process.env.NODE_ENV === 'development' ? error : undefined
+      },
       { status: 500 }
     );
   }
