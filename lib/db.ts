@@ -1,26 +1,29 @@
 import mysql, { PoolOptions } from 'mysql2/promise';
 
-if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_NAME) {
+if (!process.env.MYSQL_URL) {
+  console.error('Chybějící proměnné prostředí:');
+  console.error('MYSQL_URL:', process.env.MYSQL_URL ? 'nastaveno' : 'chybí');
+  console.error('NODE_ENV:', process.env.NODE_ENV);
   throw new Error('Chybí povinné proměnné prostředí pro databázi');
 }
 
 const config: PoolOptions = {
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD || '',
+  uri: process.env.MYSQL_URL,
   waitForConnections: true,
   connectionLimit: 5,
   queueLimit: 0,
   connectTimeout: 5000,
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000,
-  ssl: {
-    rejectUnauthorized: true,
-    // Některé databázové služby mohou vyžadovat další SSL nastavení
-    minVersion: 'TLSv1.2'
-  }
+  ssl: process.env.NODE_ENV === 'production' ? {
+    rejectUnauthorized: false
+  } : undefined
 };
+
+console.log('Database config:', {
+  uri: 'hidden for security',
+  ssl: config.ssl ? 'enabled' : 'disabled'
+});
 
 // Vytvoření poolu s explicitním typem
 const pool = mysql.createPool(config);
@@ -29,9 +32,7 @@ const pool = mysql.createPool(config);
 const testConnection = async () => {
   try {
     console.log('Attempting database connection...');
-    console.log('Host:', process.env.DB_HOST);
-    console.log('Database:', process.env.DB_NAME);
-    console.log('User:', process.env.DB_USER);
+    console.log('Environment:', process.env.NODE_ENV);
     
     const connection = await pool.getConnection();
     console.log('Database connection successful');
