@@ -1,28 +1,31 @@
 import mysql, { PoolOptions } from 'mysql2/promise';
 
-if (!process.env.MYSQL_URL) {
+if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_NAME) {
   console.error('Chybějící proměnné prostředí:');
-  console.error('MYSQL_URL:', process.env.MYSQL_URL ? 'nastaveno' : 'chybí');
+  console.error('DB_HOST:', process.env.DB_HOST ? 'nastaveno' : 'chybí');
+  console.error('DB_USER:', process.env.DB_USER ? 'nastaveno' : 'chybí');
+  console.error('DB_NAME:', process.env.DB_NAME ? 'nastaveno' : 'chybí');
   console.error('NODE_ENV:', process.env.NODE_ENV);
   throw new Error('Chybí povinné proměnné prostředí pro databázi');
 }
 
 const config: PoolOptions = {
-  uri: process.env.MYSQL_URL,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 5,
   queueLimit: 0,
   connectTimeout: 5000,
   enableKeepAlive: true,
-  keepAliveInitialDelay: 10000,
-  ssl: process.env.NODE_ENV === 'production' ? {
-    rejectUnauthorized: false
-  } : undefined
+  keepAliveInitialDelay: 10000
 };
 
 console.log('Database config:', {
-  uri: 'hidden for security',
-  ssl: config.ssl ? 'enabled' : 'disabled'
+  host: config.host,
+  user: config.user,
+  database: config.database
 });
 
 // Vytvoření poolu s explicitním typem

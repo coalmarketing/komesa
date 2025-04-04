@@ -1,0 +1,64 @@
+RewriteEngine On
+Options +FollowSymLinks
+
+# Povolení CORS
+Header set Access-Control-Allow-Origin "*"
+
+# Aktivace proxy modulů
+<IfModule mod_proxy.c>
+    ProxyRequests Off
+    ProxyPreserveHost On
+    
+    # Statické soubory z public složky
+    RewriteCond %{REQUEST_URI} ^/logo/
+    RewriteRule ^(.*)$ /.next/standalone/public/$1 [L]
+    
+    # Mapování _next na .next pro statické soubory
+    RewriteRule ^_next/(.*) /.next/$1 [L]
+    
+    # Next.js statické soubory
+    ProxyPass /.next http://127.0.0.1:3000/.next
+    ProxyPassReverse /.next http://127.0.0.1:3000/.next
+    
+    # Next.js API routes
+    ProxyPass /api http://127.0.0.1:3000/api
+    ProxyPassReverse /api http://127.0.0.1:3000/api
+    
+    # Obecné proxy pro zbytek
+    ProxyPass / http://127.0.0.1:3000/
+    ProxyPassReverse / http://127.0.0.1:3000/
+</IfModule>
+
+# Zpracování WebSocket připojení
+RewriteCond %{HTTP:Upgrade} websocket [NC]
+RewriteCond %{HTTP:Connection} upgrade [NC]
+RewriteRule ^/?(.*) "ws://127.0.0.1:3000/$1" [P,L]
+
+# Přesměrování HTTP na HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Cache-Control hlavičky pro statické soubory
+<FilesMatch "\.(jpg|jpeg|png|gif|svg|js|css)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+
+# Zabránění přímému přístupu k určitým typům souborů
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+    Satisfy All
+</FilesMatch>
+
+# Povolení přístupu k .next adresáři a public složce
+<Directory "/var/www/dev.ondrejkrejci.com/.next">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+
+<Directory "/var/www/dev.ondrejkrejci.com/.next/standalone/public">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>

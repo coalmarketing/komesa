@@ -27,6 +27,7 @@ const WriteReviewPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const validateForm = (data: FormData): FormErrors => {
     const errors: FormErrors = {};
@@ -73,7 +74,6 @@ const WriteReviewPage = () => {
     }
 
     try {
-      // Vytvoření aktuálního data a času ve formátu YYYY-MM-DD HH:mm:ss
       const now = new Date();
       const formattedDate = now.getFullYear() + '-' + 
         String(now.getMonth() + 1).padStart(2, '0') + '-' + 
@@ -98,8 +98,10 @@ const WriteReviewPage = () => {
         throw new Error(errorData.error || 'Nepodařilo se odeslat recenzi');
       }
 
-      // Přesměrování na stránku s referencemi
-      router.push('/reference?success=true');
+      setShowSuccess(true);
+      setTimeout(() => {
+        router.push('/');
+      }, 3000);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Došlo k chybě při odesílání recenze. Prosím zkuste to znovu později.');
     } finally {
@@ -109,10 +111,52 @@ const WriteReviewPage = () => {
 
   return (
     <>
+      <style jsx global>{`
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes scaleIn {
+          from {
+            transform: scale(0);
+          }
+          to {
+            transform: scale(1);
+          }
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+      `}</style>
       <Navbar />
       <main className="pt-28 pb-16">
-        <div className="px-4 md:px-8 w-[min(800px,100%)] mx-auto">
+        <div className="px-4 md:px-8 w-[min(800px,100%)] mx-auto relative">
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">NAPIŠTE NÁM RECENZI</h1>
+          {showSuccess && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-[fadeIn_0.3s_ease-out]"></div>
+              <div className="bg-white rounded-lg p-8 text-center max-w-md mx-4 relative z-10 animate-[slideIn_0.3s_ease-out]">
+                <div className="w-16 h-16 mx-auto mb-4 text-green-500 animate-[scaleIn_0.5s_ease-out]">
+                  <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold mb-4 animate-[fadeIn_0.5s_ease-out]">Děkujeme za zpětnou vazbu!</h2>
+                <p className="text-gray-600 animate-[fadeIn_0.5s_ease-out]">Vaše recenze byla úspěšně odeslána.</p>
+              </div>
+            </div>
+          )}
           <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
             Děkujeme, že jste využili naše služby! Budeme rádi, když se s námi podělíte o svou zkušenost. Vaše zpětná vazba je pro nás velmi důležitá.
           </p>

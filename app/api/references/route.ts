@@ -52,50 +52,101 @@ function validateReference(data: any): { isValid: boolean; errors: string[] } {
 export async function GET() {
   console.log('Public: Začátek načítání referencí');
   try {
+    // Kontrola proměnných prostředí s detailním logováním
+    console.log('Kontrola proměnných prostředí:', {
+      DB_HOST: !!process.env.DB_HOST,
+      DB_USER: !!process.env.DB_USER,
+      DB_NAME: !!process.env.DB_NAME,
+      NODE_ENV: process.env.NODE_ENV
+    });
+
     if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_NAME) {
       console.error('Public: Chybí databázové proměnné prostředí');
       return NextResponse.json(
         { error: 'Chybí konfigurace databáze' },
-        { status: 500 }
+        { 
+          status: 500,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+          }
+        }
       );
     }
 
     console.log('Public: Získávání připojení k databázi');
-    const connection = await pool.getConnection();
+    let connection;
     try {
-      // Nejprve zkontrolujeme všechny reference
-      console.log('Public: Kontrola všech referencí');
-      const [allRows] = await connection.execute<Reference[]>(
-        'SELECT id, stars, text, location, date, approved FROM `references`'
+      connection = await pool.getConnection();
+    } catch (error) {
+      console.error('Public: Chyba při připojení k databázi:', error);
+      return NextResponse.json(
+        { 
+          error: 'Nelze se připojit k databázi',
+          details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+        },
+        { 
+          status: 500,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+          }
+        }
       );
-      console.log('Public: Všechny reference:', allRows);
+    }
 
-      // Pak získáme pouze schválené
+    try {
+      // Test připojení jednoduchým dotazem
+      console.log('Public: Test připojení k databázi');
+      await connection.query('SELECT 1');
+
       console.log('Public: Načítání schválených referencí');
       const [rows] = await connection.execute<Reference[]>(
-        'SELECT id, stars, text, location, date FROM `references` WHERE approved = true ORDER BY date DESC'
+        'SELECT id, stars, text, location, date FROM `user_references` WHERE approved = true ORDER BY date DESC'
       );
-      console.log('Public: Schválené reference:', rows);
+      console.log('Public: Počet načtených referencí:', rows.length);
 
-      return NextResponse.json(rows);
+      return NextResponse.json(rows, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+        }
+      });
     } catch (error) {
       console.error('Public: Chyba při SQL dotazu:', error);
       return NextResponse.json(
-        { error: `Chyba při SQL dotazu: ${error instanceof Error ? error.message : 'Neznámá chyba'}` },
-        { status: 500 }
+        { 
+          error: 'Chyba při načítání dat z databáze',
+          details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+        },
+        { 
+          status: 500,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+          }
+        }
       );
     } finally {
-      console.log('Public: Uvolňování připojení');
-      connection.release();
+      if (connection) {
+        console.log('Public: Uvolňování připojení');
+        connection.release();
+      }
     }
   } catch (error) {
-    console.error('Public: Chyba při načítání referencí:', error);
+    console.error('Public: Neošetřená chyba:', error);
     return NextResponse.json(
       { 
-        error: `Chyba při připojení k databázi: ${error instanceof Error ? error.message : 'Neznámá chyba'}`,
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        error: 'Neočekávaná chyba při zpracování požadavku',
+        details: process.env.NODE_ENV === 'development' ? String(error) : undefined
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+        }
+      }
     );
   }
 }
@@ -120,7 +171,7 @@ export async function POST(request: Request) {
     try {
       console.log('Public: Provádění SQL dotazu pro vložení');
       const [result] = await connection.execute(
-        'INSERT INTO `references` (stars, text, location, email, date, approved) VALUES (?, ?, ?, ?, ?, false)',
+        'INSERT INTO `user_references` (stars, text, location, email, date, approved) VALUES (?, ?, ?, ?, ?, false)',
         [data.stars, data.text, data.location, data.email, data.date]
       );
       console.log('Public: Reference úspěšně uložena:', result);

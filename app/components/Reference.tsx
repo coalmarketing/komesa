@@ -81,11 +81,22 @@ const Reference: React.FC<ReferenceProps> = ({ variant = 'primary', limit = 3 })
     const fetchReferences = async () => {
       try {
         console.log('Začátek načítání referencí v komponentě');
-        const response = await fetch('/api/references');
+        const response = await fetch('/api/references', {
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error('Server nevrátil JSON data');
+        }
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || 'Nepodařilo se načíst reference');
         }
+
         const data = await response.json();
         console.log('Načtená data:', data);
         setReferences(data);
@@ -105,7 +116,12 @@ const Reference: React.FC<ReferenceProps> = ({ variant = 'primary', limit = 3 })
   }
 
   if (error) {
-    return <div className="text-center py-16 text-red-500">{error}</div>;
+    return (
+      <div className="text-center py-16">
+        <p className="text-red-500 font-bold mb-2">Chyba při načítání referencí</p>
+        <p className="text-gray-600">{error}</p>
+      </div>
+    );
   }
 
   // Pokud nemáme žádné reference, zobrazíme zprávu

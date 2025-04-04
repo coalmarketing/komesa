@@ -4,17 +4,17 @@ import { ResultSetHeader } from 'mysql2';
 
 export async function POST(request: Request) {
   try {
-    const { id, approved } = await request.json();
+    const { id } = await request.json();
 
-    console.log('Admin: Získávání připojení k databázi');
+    console.log('Admin: Získávání připojení k databázi pro smazání reference');
     const connection = await pool.getConnection();
     try {
-      console.log('Admin: Provádění SQL dotazu pro aktualizaci');
+      console.log('Admin: Provádění SQL dotazu pro smazání');
       const [result] = await connection.execute<ResultSetHeader>(
-        'UPDATE `user_references` SET approved = ? WHERE id = ?',
-        [approved, id]
+        'DELETE FROM `user_references` WHERE id = ?',
+        [id]
       );
-      console.log('Admin: Výsledek aktualizace:', result);
+      console.log('Admin: Výsledek smazání:', result);
 
       if (result.affectedRows === 0) {
         console.error('Admin: Reference nebyla nalezena:', id);
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       connection.release();
     }
   } catch (error) {
-    console.error('Error updating reference:', error);
+    console.error('Error deleting reference:', error);
     return NextResponse.json(
       { success: false, message: 'Interní chyba serveru' },
       { status: 500 }

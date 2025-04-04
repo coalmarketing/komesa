@@ -20,11 +20,17 @@ export async function GET() {
     try {
       console.log('Admin: Načítání všech referencí');
       const [rows] = await connection.execute<Reference[]>(
-        'SELECT * FROM `references` ORDER BY date DESC'
+        'SELECT * FROM `user_references` ORDER BY date DESC'
       );
       console.log('Admin: Reference načteny:', rows);
 
-      return NextResponse.json(rows);
+      return NextResponse.json(rows, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
     } catch (error) {
       console.error('Admin: Chyba při SQL dotazu:', error);
       throw error;

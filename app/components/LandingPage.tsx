@@ -1,3 +1,5 @@
+'use client';
+
 import Image from "next/image";
 import Button from "./Button";
 import hrad1 from "../../public/hrady/hrad1.jpg";
@@ -34,7 +36,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col md:items-start items-center w-full md:w-[fit-content]">
               <div>
-                <Button href="/nabidka">
+                <Button href="#skakaci-hrady">
                   Prozkoumat nabídku!
                 </Button>
               </div>

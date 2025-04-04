@@ -1,0 +1,16 @@
+{
+  "name": "Radka Zemanová - Skákací hrady",
+  "short_name": "Skákací hrady",
+  "description": "Pronájem skákacích hradů pro vaše akce",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#F34B6D",
+  "icons": [
+    {
+      "src": "/logo/RZ_logo_favicon-color.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+} 

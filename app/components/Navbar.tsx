@@ -1,7 +1,16 @@
+'use client';
+
 import Link from 'next/link';
 import Button from './Button';
 
 export default function Navbar() {
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="w-full bg-white py-2 px-4 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-2 after:bg-gradient-to-r after:from-primary after:to-secondary">
       <div className="w-[min(1500px,100%)] mx-auto flex justify-between items-center">
@@ -14,18 +23,29 @@ export default function Navbar() {
         </Link>
         
         <div className="hidden md:flex items-center gap-12 text-xl">
-          <Link href="/skakaci-hrady" className="text-gray-700 hover:text-primary font-semibold">
+          <button 
+            onClick={() => scrollToSection('skakaci-hrady')} 
+            className="text-gray-700 hover:text-primary font-semibold"
+          >
             Skákací hrady
-          </Link>
-          <Link href="/reference" className="text-gray-700 hover:text-primary font-semibold">
+          </button>
+          <button 
+            onClick={() => scrollToSection('reference')} 
+            className="text-gray-700 hover:text-primary font-semibold"
+          >
             Reference
-          </Link>
-          <Link href="/nejcastejsi-dotazy" className="text-gray-700 hover:text-primary font-semibold">
+          </button>
+          <button 
+            onClick={() => scrollToSection('nejcastejsi-dotazy')} 
+            className="text-gray-700 hover:text-primary font-semibold"
+          >
             Nejčastější dotazy
-          </Link>
-          <Button href="/objednat">
-            Objednat!
-          </Button>
+          </button>
+          <div onClick={() => scrollToSection('kontakt')}>
+            <Button>
+              Objednat!
+            </Button>
+          </div>
         </div>
         
         <button className="md:hidden text-gray-700">

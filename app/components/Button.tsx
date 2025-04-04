@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 
 interface ButtonProps {
@@ -6,7 +8,7 @@ interface ButtonProps {
   className?: string;
   variant?: 'primary' | 'secondary';
   type?: 'submit' | 'button' | 'reset';
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
   disabled?: boolean;
 }
 
@@ -16,12 +18,22 @@ export default function Button({ href, children, className, variant = 'primary',
     secondary: `inline-block bg-white border-2 border-[#F34B6D] text-[#F34B6D] px-10 py-3 rounded-[1.3rem] text-xl font-bold transition-opacity ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`
   };
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
+    if (href?.startsWith('#')) {
+      e.preventDefault();
+      const targetId = href.substring(1);
+      document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
+    }
+    onClick?.(e);
+  };
+
   // Pokud je href a není disabled, zobrazí se Link
   if (href && !disabled) {
     return (
       <Link 
         href={href}
         className={className || styles[variant]}
+        onClick={handleClick}
       >
         {children}
       </Link>
@@ -33,7 +45,7 @@ export default function Button({ href, children, className, variant = 'primary',
     <button
       type={type || 'button'}
       className={className || styles[variant]}
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
     >
       {children}

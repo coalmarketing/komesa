@@ -4,7 +4,7 @@ import { hrady } from "../data/hrady";
 
 export default function SkákaciHrady() {
   return (
-    <section className="py-8 sm:py-12 md:py-16 bg-gradient-to-r from-primary to-secondary mt-8 sm:mt-32 md:mt-40">
+    <section id="skakaci-hrady" className="py-8 sm:py-12 md:py-16 bg-gradient-to-r from-primary to-secondary mt-8 sm:mt-32 md:mt-40">
       <div className="w-[min(1300px,100%)] mx-auto px-4">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center mb-8 sm:mb-12 uppercase">
           Skákací hrady

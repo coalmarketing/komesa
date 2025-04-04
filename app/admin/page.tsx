@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { cs } from 'date-fns/locale';
+import { API_URL } from '../config';
 
 interface Reference {
   id: number;
@@ -33,14 +34,30 @@ const AdminPage = () => {
   useEffect(() => {
     // Kontrola autentizace při načtení stránky
     const checkAuth = async () => {
+      // Nejprve zkontrolujeme localStorage
+      const hasAdminToken = localStorage.getItem('adminLoggedIn') === 'true';
+      if (!hasAdminToken) {
+        setIsAuthenticated(false);
+        return;
+      }
+
       try {
-        const response = await fetch('/api/admin/check-auth');
+        const response = await fetch(`${API_URL}/api/admin/check-auth`, {
+          credentials: 'include'
+        });
         if (response.ok) {
           setIsAuthenticated(true);
           await fetchReferences();
+        } else {
+          setIsAuthenticated(false);
+          localStorage.removeItem('adminLoggedIn');
         }
       } catch (err) {
-        console.error('Admin: Chyba při kontrole autentizace:', err);
+        setIsAuthenticated(false);
+        localStorage.removeItem('adminLoggedIn');
+        if (err instanceof Error) {
+          console.error('Admin: Chyba při kontrole autentizace:', err.message);
+        }
       }
     };
 
@@ -57,10 +74,14 @@ const AdminPage = () => {
   const fetchReferences = async () => {
     try {
       console.log('Admin: Načítám reference...');
-      const response = await fetch('/api/admin/references', {
+      const response = await fetch(`${API_URL}/api/admin/references`, {
         headers: {
-          'Accept': 'application/json'
-        }
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        },
+        next: { revalidate: 0 }
       });
 
       console.log('Admin: Odpověď z API:', response.status);
@@ -85,7 +106,7 @@ const AdminPage = () => {
 
     try {
       console.log('Admin: Pokus o přihlášení...');
-      const response = await fetch('/api/admin/login', {
+      const response = await fetch(`${API_URL}/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -100,6 +121,7 @@ const AdminPage = () => {
       if (response.ok) {
         setSuccess('Přihlášení úspěšné');
         setIsAuthenticated(true);
+        localStorage.setItem('adminLoggedIn', 'true');
         await fetchReferences();
       } else {
         setError(data.error || 'Chyba při přihlášení');
@@ -113,7 +135,7 @@ const AdminPage = () => {
   const handleApproval = async (id: number, approved: boolean) => {
     try {
       console.log('Admin: Pokus o aktualizaci reference:', { id, approved });
-      const response = await fetch('/api/admin/approve-reference', {
+      const response = await fetch(`${API_URL}/api/admin/approve-reference`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,19 +148,18 @@ const AdminPage = () => {
       }
 
       console.log('Admin: Reference úspěšně aktualizována');
-      setReferences(references.map(ref => 
-        ref.id === id ? { ...ref, approved } : ref
-      ));
+      await fetchReferences();
     } catch (err) {
       console.error('Admin: Chyba při aktualizaci reference:', err);
       setError('Chyba při aktualizaci reference');
+      await fetchReferences();
     }
   };
 
   const handleLogout = async () => {
     try {
       console.log('Admin: Odhlášení uživatele');
-      const response = await fetch('/api/admin/logout', {
+      const response = await fetch(`${API_URL}/api/admin/logout`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json'
@@ -149,6 +170,7 @@ const AdminPage = () => {
         setIsAuthenticated(false);
         setReferences([]);
         setLoginData({ username: '', password: '' });
+        localStorage.removeItem('adminLoggedIn');
       } else {
         console.error('Admin: Chyba při odhlášení');
       }
@@ -169,7 +191,7 @@ const AdminPage = () => {
 
     try {
       console.log('Admin: Pokus o změnu hesla');
-      const response = await fetch('/api/admin/change-password', {
+      const response = await fetch(`${API_URL}/api/admin/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -198,6 +220,34 @@ const AdminPage = () => {
     } catch (err) {
       console.error('Admin: Chyba při změně hesla:', err);
       setPasswordError('Chyba při změně hesla');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Opravdu chcete smazat tuto referenci?')) {
+      return;
+    }
+
+    try {
+      console.log('Admin: Pokus o smazání reference:', id);
+      const response = await fetch(`${API_URL}/api/admin/delete-reference`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Nepodařilo se smazat referenci');
+      }
+
+      console.log('Admin: Reference úspěšně smazána');
+      setSuccess('Reference byla úspěšně smazána');
+      await fetchReferences();
+    } catch (err) {
+      console.error('Admin: Chyba při mazání reference:', err);
+      setError('Chyba při mazání reference');
     }
   };
 
@@ -353,6 +403,15 @@ const AdminPage = () => {
               </div>
               <p className="text-gray-700 mb-4">{ref.text}</p>
               <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => handleDelete(ref.id)}
+                  className="py-2 px-4 rounded bg-red-500 text-white hover:bg-red-600"
+                  title="Smazat referenci"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </button>
                 <button
                   onClick={() => handleApproval(ref.id, false)}
                   className={`py-2 px-4 rounded ${

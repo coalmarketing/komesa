@@ -11,10 +11,18 @@ export default function Home() {
     <>
       <Navbar />
       <LandingPage />
-      <SkákaciHrady />
-      <Reference />
-      <Kontakt />
-      <NejcastejsiDotazy />
+      <div id="skakaci-hrady">
+        <SkákaciHrady />
+      </div>
+      <div id="reference">
+        <Reference />
+      </div>
+      <div id="kontakt">
+        <Kontakt />
+      </div>
+      <div id="nejcastejsi-dotazy">
+        <NejcastejsiDotazy />
+      </div>
       <Footer />
     </>
   );

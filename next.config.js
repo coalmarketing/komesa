@@ -2,12 +2,31 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  experimental: {
-    serverActions: true,
+  distDir: '.next',
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
   },
   images: {
-    remotePatterns: []
+    domains: ['dev.ondrejkrejci.com', 'localhost', '127.0.0.1'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'dev.ondrejkrejci.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+      }
+    ]
   },
+  assetPrefix: process.env.NODE_ENV === 'production' ? 'https://dev.ondrejkrejci.com' : '',
+  trailingSlash: true,
+  basePath: '',
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
   async headers() {
     return [
       {
@@ -17,6 +36,7 @@ const nextConfig = {
           { key: 'Access-Control-Allow-Origin', value: '*' },
           { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
           { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Cookie' },
+          { key: 'Content-Type', value: 'application/json' }
         ]
       }
     ]
