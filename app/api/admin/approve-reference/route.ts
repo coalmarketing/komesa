@@ -1,22 +1,21 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { ResultSetHeader } from 'mysql2';
 
 export async function POST(request: Request) {
   try {
     const { id, approved } = await request.json();
 
     console.log('Admin: Získávání připojení k databázi');
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     try {
       console.log('Admin: Provádění SQL dotazu pro aktualizaci');
-      const [result] = await connection.execute<ResultSetHeader>(
-        'UPDATE `user_references` SET approved = ? WHERE id = ?',
+      const result = await client.query(
+        'UPDATE user_references SET approved = $1 WHERE id = $2 RETURNING *',
         [approved, id]
       );
-      console.log('Admin: Výsledek aktualizace:', result);
+      console.log('Admin: Výsledek aktualizace:', result.rowCount);
 
-      if (result.affectedRows === 0) {
+      if (result.rowCount === 0) {
         console.error('Admin: Reference nebyla nalezena:', id);
         return NextResponse.json(
           { error: 'Reference nebyla nalezena' },
@@ -30,7 +29,7 @@ export async function POST(request: Request) {
       throw error;
     } finally {
       console.log('Admin: Uvolňování připojení');
-      connection.release();
+      client.release();
     }
   } catch (error) {
     console.error('Error updating reference:', error);

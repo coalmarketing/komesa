@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { RowDataPacket } from 'mysql2';
 import { cookies } from 'next/headers';
 import { verifyAuth } from '../auth';
 
-interface Reference extends RowDataPacket {
+interface Reference {
   id: number;
   email: string;
   location: string;
@@ -30,11 +29,11 @@ export async function GET() {
     }
 
     console.log('Admin: Získávání připojení k databázi');
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     try {
       console.log('Admin: Načítání všech referencí');
-      const [rows] = await connection.execute<Reference[]>(
-        'SELECT * FROM `user_references` ORDER BY date DESC'
+      const { rows } = await client.query<Reference>(
+        'SELECT * FROM user_references ORDER BY date DESC'
       );
       console.log('Admin: Reference načteny, počet:', rows.length);
 
@@ -51,7 +50,7 @@ export async function GET() {
       throw error;
     } finally {
       console.log('Admin: Uvolňování připojení');
-      connection.release();
+      client.release();
     }
   } catch (error) {
     console.error('Admin: Chyba při načítání referencí:', error);

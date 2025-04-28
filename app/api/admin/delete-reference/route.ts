@@ -1,22 +1,21 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { ResultSetHeader } from 'mysql2';
 
 export async function POST(request: Request) {
   try {
     const { id } = await request.json();
 
     console.log('Admin: Získávání připojení k databázi pro smazání reference');
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     try {
       console.log('Admin: Provádění SQL dotazu pro smazání');
-      const [result] = await connection.execute<ResultSetHeader>(
-        'DELETE FROM `user_references` WHERE id = ?',
+      const result = await client.query(
+        'DELETE FROM user_references WHERE id = $1 RETURNING *',
         [id]
       );
-      console.log('Admin: Výsledek smazání:', result);
+      console.log('Admin: Výsledek smazání:', result.rowCount);
 
-      if (result.affectedRows === 0) {
+      if (result.rowCount === 0) {
         console.error('Admin: Reference nebyla nalezena:', id);
         return NextResponse.json(
           { error: 'Reference nebyla nalezena' },
@@ -30,7 +29,7 @@ export async function POST(request: Request) {
       throw error;
     } finally {
       console.log('Admin: Uvolňování připojení');
-      connection.release();
+      client.release();
     }
   } catch (error) {
     console.error('Error deleting reference:', error);

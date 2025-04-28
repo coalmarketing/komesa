@@ -51,24 +51,24 @@ export async function validateCredentials(username: string, password: string): P
   console.log('Auth: Validace credentials pro uživatele:', username);
   
   try {
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     try {
-      const [rows] = await connection.execute(
-        'SELECT password FROM admins WHERE username = ?',
+      const result = await client.query(
+        'SELECT password FROM admins WHERE username = $1',
         [username]
       );
 
-      const admin = (rows as any[])[0] as { password: string };
-      if (!admin) {
+      if (result.rows.length === 0) {
         console.log('Auth: Uživatel nenalezen');
         return false;
       }
 
+      const admin = result.rows[0] as { password: string };
       const isValid = await bcrypt.compare(password, admin.password);
       console.log('Auth: Výsledek validace:', isValid);
       return isValid;
     } finally {
-      connection.release();
+      client.release();
     }
   } catch (error) {
     console.error('Auth: Chyba při validaci credentials:', error);
@@ -80,20 +80,20 @@ export async function changePassword(username: string, currentPassword: string, 
   console.log('Auth: Změna hesla pro uživatele:', username);
   
   try {
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     try {
       // Nejprve ověříme aktuální heslo
-      const [rows] = await connection.execute(
-        'SELECT password FROM admins WHERE username = ?',
+      const result = await client.query(
+        'SELECT password FROM admins WHERE username = $1',
         [username]
       );
 
-      const admin = (rows as any[])[0] as { password: string };
-      if (!admin) {
+      if (result.rows.length === 0) {
         console.log('Auth: Uživatel nenalezen');
         return false;
       }
 
+      const admin = result.rows[0] as { password: string };
       const isValid = await bcrypt.compare(currentPassword, admin.password);
       if (!isValid) {
         console.log('Auth: Nesprávné aktuální heslo');
@@ -102,15 +102,15 @@ export async function changePassword(username: string, currentPassword: string, 
 
       // Pokud je heslo správné, aktualizujeme ho
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await connection.execute(
-        'UPDATE admins SET password = ? WHERE username = ?',
+      await client.query(
+        'UPDATE admins SET password = $1 WHERE username = $2',
         [hashedPassword, username]
       );
 
       console.log('Auth: Heslo úspěšně změněno');
       return true;
     } finally {
-      connection.release();
+      client.release();
     }
   } catch (error) {
     console.error('Auth: Chyba při změně hesla:', error);
