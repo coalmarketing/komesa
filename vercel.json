@@ -27,5 +27,23 @@
         }
       ]
     }
-  ]
+  ],
+  "images": {
+    "domains": ["komesa.vercel.app", "komesa.cz"],
+    "remotePatterns": [
+      {
+        "protocol": "https",
+        "hostname": "komesa.vercel.app"
+      },
+      {
+        "protocol": "https",
+        "hostname": "komesa.cz"
+      }
+    ]
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_SITE_URL": "https://komesa.vercel.app"
+    }
+  }
 } 

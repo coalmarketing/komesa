@@ -31,11 +31,7 @@ const nextConfig = {
       }
     ]
   },
-  assetPrefix: process.env.NODE_ENV === 'production' 
-    ? process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'https://komesa.vercel.app' 
-    : '',
+  assetPrefix: '',
   trailingSlash: true,
   basePath: '',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
