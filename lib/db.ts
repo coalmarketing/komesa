@@ -1,35 +1,40 @@
-import mysql, { PoolOptions } from 'mysql2/promise';
+import { Pool } from 'pg';
 
-if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_NAME) {
-  console.error('Chybějící proměnné prostředí:');
-  console.error('DB_HOST:', process.env.DB_HOST ? 'nastaveno' : 'chybí');
-  console.error('DB_USER:', process.env.DB_USER ? 'nastaveno' : 'chybí');
-  console.error('DB_NAME:', process.env.DB_NAME ? 'nastaveno' : 'chybí');
+// Kontrola, zda je k dispozici DATABASE_URL
+if (!process.env.DATABASE_URL) {
+  console.error('Chybějící proměnná prostředí:');
+  console.error('DATABASE_URL:', process.env.DATABASE_URL ? 'nastaveno' : 'chybí');
   console.error('NODE_ENV:', process.env.NODE_ENV);
-  throw new Error('Chybí povinné proměnné prostředí pro databázi');
+  throw new Error('Chybí povinná proměnná prostředí DATABASE_URL pro databázi');
 }
 
-const config: PoolOptions = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 5,
-  queueLimit: 0,
-  connectTimeout: 5000,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 10000
-};
+// Debugovací informace o připojovacím řetězci
+const dbUrl = process.env.DATABASE_URL;
+console.log('Debugging připojení:');
+try {
+  // Pokus o analýzu připojovacího řetězce (bez vypsání hesla)
+  const urlObj = new URL(dbUrl);
+  console.log('- Protokol:', urlObj.protocol);
+  console.log('- Host:', urlObj.hostname);
+  console.log('- Port:', urlObj.port || 'výchozí');
+  console.log('- Uživatel:', urlObj.username);
+  console.log('- Heslo:', urlObj.password ? '********' : 'neuvedeno');
+  console.log('- Databáze:', urlObj.pathname.slice(1)); // odstranění počátečního lomítka
+} catch (error: any) {
+  console.error('Neplatný formát připojovacího řetězce:', error.message);
+  console.error('DATABASE_URL musí být ve formátu: postgresql://uzivatel:heslo@host:port/databaze');
+}
 
-console.log('Database config:', {
-  host: config.host,
-  user: config.user,
-  database: config.database
+// Vytvoření pool pro PostgreSQL
+console.log('Pokus o vytvoření databázového poolu...');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { 
+    rejectUnauthorized: false 
+  } : undefined
 });
 
-// Vytvoření poolu s explicitním typem
-const pool = mysql.createPool(config);
+console.log('Database config: Používám DATABASE_URL pro připojení k PostgreSQL databázi');
 
 // Test připojení při startu s více informacemi pro debugging
 const testConnection = async () => {
@@ -37,16 +42,37 @@ const testConnection = async () => {
     console.log('Attempting database connection...');
     console.log('Environment:', process.env.NODE_ENV);
     
-    const connection = await pool.getConnection();
+    console.log('Získávání připojení...');
+    const client = await pool.connect();
     console.log('Database connection successful');
     
     // Test jednoduchého dotazu
-    const [result] = await connection.query('SELECT 1');
-    console.log('Test query successful:', result);
+    console.log('Testovací dotaz...');
+    const result = await client.query('SELECT 1');
+    console.log('Test query successful:', result.rows);
     
-    connection.release();
-  } catch (err) {
+    client.release();
+  } catch (err: any) {
     console.error('Database connection failed:', err);
+    console.error('Detail chyby:', err instanceof Error ? err.message : String(err));
+    
+    if (err.code) {
+      console.error('Kód chyby:', err.code);
+      // Popis běžných chyb
+      const errorMessages: Record<string, string> = {
+        ECONNREFUSED: 'Server odmítl připojení - zkontrolujte, zda server běží a je dostupný na dané adrese a portu',
+        ETIMEDOUT: 'Připojení vypršelo - server je nedostupný nebo je problém s firewallem',
+        '28P01': 'Nesprávné heslo pro uživatele',
+        '28000': 'Neplatné přihlašovací údaje',
+        '3D000': 'Databáze neexistuje',
+        '42P01': 'Tabulka neexistuje'
+      };
+      
+      if (errorMessages[err.code]) {
+        console.error('Možná příčina:', errorMessages[err.code]);
+      }
+    }
+    
     // V produkci nechceme shodit celou aplikaci
     if (process.env.NODE_ENV !== 'production') {
       throw err;

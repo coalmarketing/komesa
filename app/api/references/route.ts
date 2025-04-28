@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
-interface Reference extends RowDataPacket {
+interface Reference {
   id: number;
   email: string;
   location: string;
@@ -52,16 +51,14 @@ function validateReference(data: any): { isValid: boolean; errors: string[] } {
 export async function GET() {
   console.log('Public: Začátek načítání referencí');
   try {
-    // Kontrola proměnných prostředí s detailním logováním
+    // Kontrola, zda je k dispozici DATABASE_URL
     console.log('Kontrola proměnných prostředí:', {
-      DB_HOST: !!process.env.DB_HOST,
-      DB_USER: !!process.env.DB_USER,
-      DB_NAME: !!process.env.DB_NAME,
+      DATABASE_URL: !!process.env.DATABASE_URL ? 'nastaveno' : 'chybí',
       NODE_ENV: process.env.NODE_ENV
     });
 
-    if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_NAME) {
-      console.error('Public: Chybí databázové proměnné prostředí');
+    if (!process.env.DATABASE_URL) {
+      console.error('Public: Chybí proměnná prostředí DATABASE_URL pro databázi');
       return NextResponse.json(
         { error: 'Chybí konfigurace databáze' },
         { 
@@ -75,9 +72,9 @@ export async function GET() {
     }
 
     console.log('Public: Získávání připojení k databázi');
-    let connection;
+    let client;
     try {
-      connection = await pool.getConnection();
+      client = await pool.connect();
     } catch (error) {
       console.error('Public: Chyba při připojení k databázi:', error);
       return NextResponse.json(
@@ -98,11 +95,11 @@ export async function GET() {
     try {
       // Test připojení jednoduchým dotazem
       console.log('Public: Test připojení k databázi');
-      await connection.query('SELECT 1');
+      await client.query('SELECT 1');
 
       console.log('Public: Načítání schválených referencí');
-      const [rows] = await connection.execute<Reference[]>(
-        'SELECT id, stars, text, location, date FROM `user_references` WHERE approved = true ORDER BY date DESC'
+      const { rows } = await client.query<Reference>(
+        'SELECT id, stars, text, location, date FROM user_references WHERE approved = true ORDER BY date DESC'
       );
       console.log('Public: Počet načtených referencí:', rows.length);
 
@@ -128,9 +125,9 @@ export async function GET() {
         }
       );
     } finally {
-      if (connection) {
+      if (client) {
         console.log('Public: Uvolňování připojení');
-        connection.release();
+        client.release();
       }
     }
   } catch (error) {
@@ -167,14 +164,14 @@ export async function POST(request: Request) {
     }
 
     console.log('Public: Získávání připojení k databázi');
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     try {
       console.log('Public: Provádění SQL dotazu pro vložení');
-      const [result] = await connection.execute(
-        'INSERT INTO `user_references` (stars, text, location, email, date, approved) VALUES (?, ?, ?, ?, ?, false)',
+      const result = await client.query(
+        'INSERT INTO user_references (stars, text, location, email, date, approved) VALUES ($1, $2, $3, $4, $5, false) RETURNING id',
         [data.stars, data.text, data.location, data.email, data.date]
       );
-      console.log('Public: Reference úspěšně uložena:', result);
+      console.log('Public: Reference úspěšně uložena:', result.rows[0]);
       
       return NextResponse.json({ success: true });
     } catch (error) {
@@ -182,7 +179,7 @@ export async function POST(request: Request) {
       throw error;
     } finally {
       console.log('Public: Uvolňování připojení');
-      connection.release();
+      client.release();
     }
   } catch (error) {
     console.error('Public: Chyba při ukládání reference:', error);
