@@ -39,7 +39,7 @@ export default function Navbar() {
             onClick={() => scrollToSection('nejcastejsi-dotazy')} 
             className="text-gray-700 hover:text-primary font-semibold"
           >
-            Nejčastější dotazy
+            Informace
           </button>
           <div onClick={() => scrollToSection('kontakt')}>
             <Button>

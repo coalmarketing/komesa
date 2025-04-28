@@ -40,7 +40,7 @@ export default function Footer() {
           {/* Sloupec 3: Adresa a IČO */}
           <div className="flex flex-col items-center">
             <div className="mt-2 text-center md:text-right">
-              <p className="text-xl font-bold mb-3">Mgr. Radka Zemanová</p>
+              <p className="text-xl font-bold mb-3">Mgr. Radka Zemanová, DiS.</p>
               <p className="text-md">Šedivská 838</p>
               <p className="text-md">Letohrad 561 51</p>
               <p className="text-lg mt-3">IČO: 72846861</p>

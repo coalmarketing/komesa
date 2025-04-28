@@ -4,8 +4,11 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
+import BackToHome from '../components/BackToHome';
 import { formatDistanceToNow } from 'date-fns';
 import { cs } from 'date-fns/locale';
+import { FaArrowLeft } from 'react-icons/fa';
+import Link from 'next/link';
 
 interface Reference {
   id: number;
@@ -75,6 +78,7 @@ export default function ReferencePage() {
           <div className="text-center py-16">Načítání referencí...</div>
         </main>
         <Footer />
+        <BackToHome />
       </>
     );
   }
@@ -87,6 +91,7 @@ export default function ReferencePage() {
           <div className="text-center py-16 text-red-500">{error}</div>
         </main>
         <Footer />
+        <BackToHome />
       </>
     );
   }
@@ -94,8 +99,14 @@ export default function ReferencePage() {
   return (
     <>
       <Navbar />
-      <main className="pt-28 pb-16">
+      <main className="pt-16 pb-16">
         <div className="px-4 md:px-8 w-[min(1300px,100%)] mx-auto">
+        <Link href="/">
+          <Button className="flex items-center mb-16">
+            <FaArrowLeft className="w-4 h-4 mr-2" />
+            Zpět
+          </Button>
+        </Link>
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">REFERENCE NAŠICH ZÁKAZNÍKŮ</h1>
           <p className="text-center text-gray-600 mb-16 max-w-3xl mx-auto">
             Přečtěte si, co o nás říkají naši spokojení zákazníci. Jsme rádi, že můžeme přinášet radost dětem na různých akcích po celé republice.
@@ -124,6 +135,7 @@ export default function ReferencePage() {
         </div>
       </main>
       <Footer />
+      <BackToHome />
     </>
   );
 } 

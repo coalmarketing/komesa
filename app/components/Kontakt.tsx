@@ -24,7 +24,7 @@ export default function Kontakt() {
       </div>
       <div className="flex flex-col items-center mt-4 gap-6 sm:gap-8">
         <p className="text-base sm:text-lg md:text-xl text-center max-w-2xl mx-auto">
-          Pro rezervaci skákacího hradu nebo jakýkoliv dotaz mě kontaktujte e-mailem. Těším se na Vaši zprávu!
+          Pro rezervaci skákacího hradu nebo jakýkoliv dotaz mě kontaktujte telefonicky, případně e-mailem. Těším se na Vaši zprávu!
         </p>
         
         <Button 

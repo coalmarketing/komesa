@@ -1,6 +1,7 @@
 import { sign, verify } from 'jsonwebtoken';
 import pool from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 // Zajistíme, že JWT_SECRET je vždy definován
 if (!process.env.JWT_SECRET) {
@@ -8,6 +9,23 @@ if (!process.env.JWT_SECRET) {
 }
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
+export async function verifyAuth(cookieStore: ReadonlyRequestCookies) {
+  try {
+    const token = cookieStore.get('auth-token');
+    if (!token) {
+      console.log('Auth: Token nenalezen v cookies');
+      return { isAuthenticated: false };
+    }
+
+    const isValid = verifyToken(token.value);
+    console.log('Auth: Výsledek ověření tokenu:', isValid);
+    return { isAuthenticated: isValid };
+  } catch (error) {
+    console.error('Auth: Chyba při ověřování autentizace:', error);
+    return { isAuthenticated: false };
+  }
+}
 
 export function generateToken(): string {
   console.log('Auth: Generuji token s JWT_SECRET:', JWT_SECRET);

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
+import { cookies } from 'next/headers';
+import { verifyAuth } from '../auth';
 
 interface Reference extends RowDataPacket {
   id: number;
@@ -15,6 +17,18 @@ interface Reference extends RowDataPacket {
 export async function GET() {
   console.log('Admin: Začátek načítání referencí');
   try {
+    // Ověření autentizace
+    const cookieStore = cookies();
+    const authResult = await verifyAuth(cookieStore);
+    
+    if (!authResult.isAuthenticated) {
+      console.log('Admin: Neautorizovaný přístup k referencím');
+      return NextResponse.json(
+        { error: 'Neautorizovaný přístup' },
+        { status: 401 }
+      );
+    }
+
     console.log('Admin: Získávání připojení k databázi');
     const connection = await pool.getConnection();
     try {
@@ -22,13 +36,14 @@ export async function GET() {
       const [rows] = await connection.execute<Reference[]>(
         'SELECT * FROM `user_references` ORDER BY date DESC'
       );
-      console.log('Admin: Reference načteny:', rows);
+      console.log('Admin: Reference načteny, počet:', rows.length);
 
-      return NextResponse.json(rows, {
+      return new NextResponse(JSON.stringify(rows), {
         headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
           'Pragma': 'no-cache',
-          'Expires': '0'
+          'Expires': '0',
         }
       });
     } catch (error) {
@@ -40,15 +55,21 @@ export async function GET() {
     }
   } catch (error) {
     console.error('Admin: Chyba při načítání referencí:', error);
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { success: false, message: `Chyba při načítání referencí: ${error.message}` },
-        { status: 500 }
-      );
-    }
     return NextResponse.json(
-      { success: false, message: 'Interní chyba serveru' },
+      { error: 'Chyba při načítání referencí' },
       { status: 500 }
     );
   }
+}
+
+// Přidáme OPTIONS handler pro CORS
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Methods': 'GET',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
 } 

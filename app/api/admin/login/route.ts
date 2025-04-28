@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { validateCredentials } from '../auth';
+import { validateCredentials, generateToken } from '../auth';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
@@ -11,6 +12,18 @@ export async function POST(request: Request) {
 
     if (isValid) {
       console.log('Login: Přihlášení úspěšné');
+      const token = generateToken();
+      
+      // Nastavíme token do HTTP-only cookies
+      const cookieStore = cookies();
+      cookieStore.set('auth-token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 24 * 60 * 60 // 24 hodin
+      });
+
       return NextResponse.json({ success: true });
     }
 
