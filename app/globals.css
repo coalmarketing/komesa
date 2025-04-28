@@ -1,12 +1,14 @@
+/* Font Nunito */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
+/* Tailwind direktivy */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --primary-color: #E31C79;
-  --secondary-color: #4F46E5;
+  --primary-color: #F34B6D;
+  --secondary-color: #374091;
 }
 
 body {
@@ -21,7 +23,7 @@ body {
   }
   
   .btn-primary {
-    @apply bg-gradient-to-r from-[#E31C79] to-[#4F46E5] text-white px-6 py-2 rounded-full font-semibold hover:opacity-90 transition-opacity shadow-md;
+    @apply bg-gradient-to-r from-[#F34B6D] to-[#374091] text-white px-6 py-2 rounded-full font-semibold hover:opacity-90 transition-opacity shadow-md;
   }
 
   .gradient-border-1 {
@@ -71,7 +73,6 @@ body {
     z-index: -1;
     box-sizing: border-box;
   }
-  
 }
 
 /* Vlastní scrollbar */
