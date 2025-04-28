@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "node .next/standalone/server.js",
-    "lint": "next lint",
-    "deploy": "vercel"
+    "lint": "next lint"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",

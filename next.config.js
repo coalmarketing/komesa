@@ -7,7 +7,7 @@ const nextConfig = {
     return 'build-' + Date.now()
   },
   images: {
-    domains: ['dev.ondrejkrejci.com', 'localhost', '127.0.0.1'],
+    domains: ['dev.ondrejkrejci.com', 'localhost', '127.0.0.1', 'komesa.vercel.app', 'komesa.cz'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -20,6 +20,14 @@ const nextConfig = {
       {
         protocol: 'http',
         hostname: '127.0.0.1',
+      },
+      {
+        protocol: 'https',
+        hostname: 'komesa.vercel.app',
+      },
+      {
+        protocol: 'https',
+        hostname: 'komesa.cz',
       }
     ]
   },
