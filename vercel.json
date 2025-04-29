@@ -44,7 +44,7 @@
   },
   "build": {
     "env": {
-      "NEXT_PUBLIC_SITE_URL": "https://komesa.vercel.app"
+      "NEXT_PUBLIC_SITE_URL": "https://komesa.cz"
     }
   }
 } 
