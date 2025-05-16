@@ -7,7 +7,7 @@ const nextConfig = {
     return 'build-' + Date.now()
   },
   images: {
-    domains: ['dev.ondrejkrejci.com', 'localhost', '127.0.0.1', 'komesa.vercel.app', 'komesa.cz'],
+    domains: ['dev.ondrejkrejci.com', 'localhost', '127.0.0.1', 'komesa.cz'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -23,15 +23,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'komesa.vercel.app',
-      },
-      {
-        protocol: 'https',
         hostname: 'komesa.cz',
       }
     ]
   },
-  assetPrefix: '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? 'https://komesa.cz' : '',
   trailingSlash: true,
   basePath: '',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx'],

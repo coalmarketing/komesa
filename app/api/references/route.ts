@@ -48,6 +48,17 @@ function validateReference(data: any): { isValid: boolean; errors: string[] } {
   };
 }
 
+// Získání CORS hlaviček pro API
+const getCorsHeaders = () => {
+  const origins = ['https://komesa.vercel.app', 'https://komesa.cz', 'http://localhost:3000'];
+  
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+  };
+};
+
 export async function GET() {
   console.log('Public: Začátek načítání referencí');
   try {
@@ -63,10 +74,7 @@ export async function GET() {
         { error: 'Chybí konfigurace databáze' },
         { 
           status: 500,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-          }
+          headers: getCorsHeaders()
         }
       );
     }
@@ -84,10 +92,7 @@ export async function GET() {
         },
         { 
           status: 500,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-          }
+          headers: getCorsHeaders()
         }
       );
     }
@@ -104,10 +109,7 @@ export async function GET() {
       console.log('Public: Počet načtených referencí:', rows.length);
 
       return NextResponse.json(rows, {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET',
-        }
+        headers: getCorsHeaders()
       });
     } catch (error) {
       console.error('Public: Chyba při SQL dotazu:', error);
@@ -118,10 +120,7 @@ export async function GET() {
         },
         { 
           status: 500,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-          }
+          headers: getCorsHeaders()
         }
       );
     } finally {
@@ -139,10 +138,7 @@ export async function GET() {
       },
       { 
         status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET',
-        }
+        headers: getCorsHeaders()
       }
     );
   }
@@ -159,7 +155,10 @@ export async function POST(request: Request) {
       console.error('Public: Chybí povinné údaje:', data);
       return NextResponse.json(
         { error: 'Chybí povinné údaje' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: getCorsHeaders()
+        }
       );
     }
 
@@ -173,7 +172,10 @@ export async function POST(request: Request) {
       );
       console.log('Public: Reference úspěšně uložena:', result.rows[0]);
       
-      return NextResponse.json({ success: true });
+      return NextResponse.json(
+        { success: true },
+        { headers: getCorsHeaders() }
+      );
     } catch (error) {
       console.error('Public: Chyba při SQL dotazu:', error);
       throw error;
@@ -186,12 +188,26 @@ export async function POST(request: Request) {
     if (error instanceof Error) {
       return NextResponse.json(
         { error: `Chyba při ukládání reference: ${error.message}` },
-        { status: 500 }
+        { 
+          status: 500,
+          headers: getCorsHeaders() 
+        }
       );
     }
     return NextResponse.json(
       { error: 'Chyba při ukládání reference' },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: getCorsHeaders()
+      }
     );
   }
+}
+
+// Přidání podpory pro preflight OPTIONS požadavky
+export async function OPTIONS() {
+  return NextResponse.json(
+    {},
+    { headers: getCorsHeaders() }
+  );
 } 

@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   console.log('Middleware: Kontrola cesty:', request.nextUrl.pathname);
+  console.log('Middleware: Doména:', request.nextUrl.host);
 
   // Povolíme přihlašovací endpoint bez autentizace
   if (request.nextUrl.pathname === '/api/admin/login') {

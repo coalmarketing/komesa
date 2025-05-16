@@ -29,9 +29,9 @@ try {
 console.log('Pokus o vytvoření databázového poolu...');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { 
+  ssl: { 
     rejectUnauthorized: false 
-  } : undefined
+  }
 });
 
 console.log('Database config: Používám DATABASE_URL pro připojení k PostgreSQL databázi');
