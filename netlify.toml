@@ -6,4 +6,4 @@ publish = ".next"
   package = "@netlify/plugin-nextjs"
 
 [build.environment]
-  DATABASE_URL = "postgresql://uživatel:heslo@host:port/databáze"
+  DATABASE_URL = "postgresql://postgres.awihyqbivrlsctaaviaf:y6xx2ymbRLmjUvrL@aws-0-us-east-2.pooler.supabase.com:6543/postgres"
