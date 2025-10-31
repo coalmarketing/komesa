@@ -1,11 +1,13 @@
 // Import obrázků
-import vlnkaImg from "../../public/hrady/vlnka.jpg";
-import vezeImg from "../../public/hrady/věže.jpg";
-import skokImg from "../../public/hrady/skok.jpg";
-import piratImg from "../../public/hrady/pirát.jpg";
-import skluzavkyImg from "../../public/hrady/skluzavky.jpg";
-import tunelImg from "../../public/hrady/tunel.jpg";
-import minihradImg from "../../public/hrady/minihrad.jpg";
+import vlnkaImg from "../../public/new-photo/06_vlnka/IMG_8476.webp";
+import vezeImg from "../../public/new-photo/07_veze/IMG_1004.webp";
+import skokImg from "../../public/new-photo/05_skok/IMG_9020.webp";
+import piratImg from "../../public/new-photo/04_pirat/IMG_1569.webp";
+import skluzavkyImg from "../../public/new-photo/03_dve-skluzavky/IMG_2373.webp";
+import tunelImg from "../../public/new-photo/02_tunel/IMG_4394.webp";
+import minihradImg from "../../public/new-photo/01_minihrad/01-01.webp";
+
+// Obrázky se načítají dynamicky v komponentě HradDetail pomocí API endpointu
 
 export interface Hrad {
   id: number;
@@ -16,7 +18,8 @@ export interface Hrad {
   sjednanáCena?: string;  
   doprava: string;
   obsluha: string;
-  obrázek: any;
+  obrázek: any; // Zachováváme pro zpětnou kompatibilitu
+  // obrázky se načítají dynamicky v komponentě pomocí API
 }
 
 export const hrady: Hrad[] = [

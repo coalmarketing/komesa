@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "node .next/standalone/server.js",
-    "lint": "next lint"
+    "lint": "next lint",
+    "convert-images": "node scripts/convert-images-to-webp.js",
+    "convert-images:replace": "node scripts/convert-images-to-webp.js --replace"
   },
   "dependencies": {
     "@netlify/plugin-nextjs": "^5.10.7",

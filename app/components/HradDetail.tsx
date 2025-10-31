@@ -1,14 +1,40 @@
+'use client';
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 import { Hrad } from "../data/hrady";
 import Button from "./Button";
 import Kontakt from "./Kontakt";
+import ImageCarousel from "./ImageCarousel";
+
 interface HradDetailProps {
   hrad: Hrad;
 }
 
 export default function HradDetail({ hrad }: HradDetailProps) {
+  const [images, setImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Načtení obrázků ze složky podle ID hradu
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const response = await fetch(`/api/images/${hrad.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setImages(data.images || []);
+        }
+      } catch (error) {
+        console.error('Error loading images:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, [hrad.id]);
   return (
     <div className="w-[min(1500px,100%)] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         <Link href="/">
@@ -17,9 +43,9 @@ export default function HradDetail({ hrad }: HradDetailProps) {
             Zpět
           </Button>
         </Link>
-      <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 mt-2 sm:mt-4">
-        {/* Levá strana */}
-        <div className="flex-[2]">
+      <div className="flex flex-col lg:flex-row lg:items-stretch gap-4 sm:gap-6 lg:gap-8 mt-2 sm:mt-4">
+        {/* Levá strana - obsah */}
+        <div className="lg:flex-1 flex flex-col">
           <h1 className="text-[2rem] sm:text-[3rem] lg:text-[4rem] font-extrabold mb-2 leading-tight">{hrad.název}</h1>
           
           <div className="mb-3 sm:mb-4 mt-4 sm:mt-6">
@@ -44,17 +70,28 @@ export default function HradDetail({ hrad }: HradDetailProps) {
           </div>
         </div>
 
-        {/* Pravá strana */}
-        <div className="flex-1">
-          <div className="rounded-[2rem] sm:rounded-[3rem] lg:rounded-[5rem] overflow-hidden">
-            <Image 
-              src={hrad.obrázek} 
-              alt={hrad.název}
-              width={500}
-              height={333}
-              className="w-full h-auto object-cover"
-            />
-          </div>
+        {/* Pravá strana - fotka na desktopu vedle levého sloupce */}
+        <div className="lg:flex-1 lg:min-w-[40%] lg:max-w-[50%] lg:flex lg:flex-col">
+          {!loading && images.length > 0 ? (
+            <div className="w-full h-[300px] sm:h-[400px] lg:h-full lg:flex-1">
+              <ImageCarousel 
+                images={images} 
+                alt={hrad.název}
+                interval={4000}
+              />
+            </div>
+          ) : (
+            <div className="w-full h-[300px] sm:h-[400px] lg:h-full lg:flex-1 rounded-[2rem] sm:rounded-[3rem] lg:rounded-[5rem] overflow-hidden">
+              <div className="relative w-full h-full">
+                <Image 
+                  src={hrad.obrázek} 
+                  alt={hrad.název}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

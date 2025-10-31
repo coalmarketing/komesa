@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Button from "./Button";
-import hrad1 from "../../public/hrady/hrad1.jpg";
-import hrad2 from "../../public/hrady/hrad2.jpg";
+import hrad1 from "../../public/new-photo/dron.jpg";
+import hrad2 from "../../public/new-photo/vsechny-hrady.jpg";
 import arrow from "../../public/icons/sipky.svg";
 
 export default function LandingPage() {
@@ -31,7 +31,7 @@ export default function LandingPage() {
             <h1 className="text-3xl sm:text-4xl md:text-7xl font-bold mb-4 md:mb-8 text-center md:text-left">
               <span className="text-[#E31C79]">Skákací hrady</span> pro nezapomenutelné chvíle plné radosti!
             </h1>
-            <p className="text-lg sm:text-xl md:text-3xl mb-6 md:mb-12 w-full md:w-[90%] lg:w-[70%] text-center md:text-left">
+            <p className="text-lg sm:text-xl md:text-3xl mb-6 md:mb-12 w-full md:w-[90%] lg:w-[70%] text-center md:text-left font-light">
               Plánujete oslavu narozenin, výročí, dětský den, firemní akci nebo jinou společenskou událost?
             </p>
             <div className="flex flex-col md:items-start items-center w-full md:w-[fit-content]">
