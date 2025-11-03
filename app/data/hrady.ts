@@ -25,7 +25,7 @@ export interface Hrad {
 export const hrady: Hrad[] = [
   {
     id: 1,
-    název: "Velký skákací hrad \"Vlnka\"",
+    název: "Velký skákací hrad \"Vlnka\" ",
     popis: "Pronájem skákacího hradu je ideální volbou pro sbory dobrovolných hasičů, základní a mateřské školy, mateřská centra, dětské domovy, domy dětí a mládeže i pro občanská sdružení a organizace zaměřené na práci s dětmi.",
     rozměry: ["8 m", "4 m", "4 m"],
     základníCena: "5 900 Kč/den",
