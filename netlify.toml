@@ -1,9 +1,14 @@
 [build]
- command = "npm run build"
-publish = ".next"
+  command = "npm run build"
+  publish = ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  
+[functions]
+  # Optimalizace velikosti funkcí
+  included_files = []
+  node_bundler = "esbuild"
 
 [build.environment]
   DATABASE_URL = "postgresql://postgres.awihyqbivrlsctaaviaf:y6xx2ymbRLmjUvrL@aws-0-us-east-2.pooler.supabase.com:6543/postgres"

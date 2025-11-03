@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node .next/standalone/server.js",
+    "start": "next start",
     "lint": "next lint",
     "convert-images": "node scripts/convert-images-to-webp.js",
-    "convert-images:replace": "node scripts/convert-images-to-webp.js --replace"
+    "convert-images:replace": "node scripts/convert-images-to-webp.js --replace",
+    "optimize-images": "node scripts/optimize-images.js"
   },
   "dependencies": {
     "@netlify/plugin-nextjs": "^5.10.7",

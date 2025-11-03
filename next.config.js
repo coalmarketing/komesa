@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
+  // output: 'standalone' - odstraněno pro Netlify (plugin to zvládne sám)
   distDir: '.next',
   generateBuildId: async () => {
     return 'build-' + Date.now()
