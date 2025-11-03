@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Button from "./Button";
-import hrad1 from "../../public/new-photo/dron.jpg";
-import hrad2 from "../../public/new-photo/vsechny-hrady.jpg";
+import hrad1 from "../../public/new-photo/dron.webp";
+import hrad2 from "../../public/new-photo/vsechny-hrady.webp";
 import arrow from "../../public/icons/sipky.svg";
 
 export default function LandingPage() {
