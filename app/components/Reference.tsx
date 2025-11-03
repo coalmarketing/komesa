@@ -174,14 +174,14 @@ const Reference: React.FC<ReferenceProps> = ({ variant = 'primary', limit = 3 })
           Pokud jste si u nás objednali skákací hrad, budeme rádi, když přidáte referenci také na Google. Pomůže to dalším rodičům při rozhodování a podpoříte naši práci.
         </p>
         <a 
-          href="https://share.google/v4titwPLq3arWZWeR" 
+          href="https://www.google.com/search?sca_esv=b2a8967dde6882f4&rlz=1C5CHFA_enCZ1054CZ1054&sxsrf=AE3TifPQyL1EaLTdwC-iNyRFVHLFeS-vcg:1762155022021&si=AMgyJEvkVjFQtirYNBhM3ZJIRTaSJ6PxY6y1_6WZHGInbzDnMXpDNv8ljP9aABJvhclwbFo2ihW1AtL9r6Xr6HdaMwVZjYEGUG2VOSczIbg7CdxcaWzlM0P4RYtb0b0KZGMQ8GjEJrVt&q=komesa+Recenze&sa=X&ved=2ahUKEwijwYGBu9WQAxU-h_0HHRAcOWAQ0bkNegQIIxAE&biw=1690&bih=1052&dpr=2" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#F34B6D] to-[#374091] text-white rounded-full hover:opacity-90 transition-opacity shadow-lg"
+          className="inline-flex items-center justify-center gap-3 px-10 py-3 bg-gradient-to-r from-[#F34B6D] to-[#374091] text-white rounded-[1.3rem] text-xl font-bold transition-opacity hover:opacity-90"
           aria-label="Přidat referenci na Google"
         >
           <Image src={google} alt="Google" width={24} height={24} />
-          <span className="font-semibold">Přidat referenci na Google</span>
+          Přidat referenci na Google
         </a>
       </div>
     </section>
