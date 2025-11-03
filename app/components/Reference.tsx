@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Button from './Button';
 import { formatDistanceToNow } from 'date-fns';
 import { cs } from 'date-fns/locale';
+import google from '@/public/icons/google-white.svg';
 
 interface Reference {
   id: number;
@@ -161,6 +163,26 @@ const Reference: React.FC<ReferenceProps> = ({ variant = 'primary', limit = 3 })
         >
           Napsat recenzi
         </Button>
+      </div>
+      
+      {/* Google reference sekce */}
+      <div className="mt-8 sm:mt-12 pt-8 sm:pt-12 border-t border-gray-300 flex flex-col items-center gap-4">
+        <p className="text-lg sm:text-xl font-semibold text-center text-gray-800">
+          Podělte se o své zkušenosti na Google
+        </p>
+        <p className="text-sm sm:text-base text-center text-gray-600 max-w-2xl">
+          Pokud jste si u nás objednali skákací hrad, budeme rádi, když přidáte referenci také na Google. Pomůže to dalším rodičům při rozhodování a podpoříte naši práci.
+        </p>
+        <a 
+          href="https://share.google/v4titwPLq3arWZWeR" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#F34B6D] to-[#374091] text-white rounded-full hover:opacity-90 transition-opacity shadow-lg"
+          aria-label="Přidat referenci na Google"
+        >
+          <Image src={google} alt="Google" width={24} height={24} />
+          <span className="font-semibold">Přidat referenci na Google</span>
+        </a>
       </div>
     </section>
   );

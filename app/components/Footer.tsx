@@ -5,6 +5,9 @@ import phone from '@/public/icons/phone-white.svg';
 import email from '@/public/icons/email-white.svg';
 import logo from '@/public/logo/RZ_logo_long-white.svg';
 import srdce from '@/public/icons/srdce.svg';
+import instagram from '@/public/icons/instagram-white.svg';
+import facebook from '@/public/icons/facebook-white.svg';
+import linkedin from '@/public/icons/linkedin-white.svg';
 
 export default function Footer() {
   return (
@@ -44,6 +47,42 @@ export default function Footer() {
               <p className="text-md">Šedivská 838</p>
               <p className="text-md">Letohrad 561 51</p>
               <p className="text-lg mt-3">IČO: 72846861</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Sekce sociálních sítí */}
+        <div className="mt-8 pt-8 border-t border-white/20">
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-lg font-semibold mb-2">Sledujte nás na sociálních sítích</p>
+            <div className="flex flex-wrap justify-center items-center gap-6">
+              <a 
+                href="https://www.instagram.com/radka.zemanova9/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity"
+                aria-label="Instagram"
+              >
+                <Image src={instagram} alt="Instagram" width={40} height={40} />
+              </a>
+              <a 
+                href="https://www.facebook.com/radka.zemanova82" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity"
+                aria-label="Facebook"
+              >
+                <Image src={facebook} alt="Facebook" width={40} height={40} />
+              </a>
+              <a 
+                href="https://www.linkedin.com/in/radka-zemanová/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity"
+                aria-label="LinkedIn"
+              >
+                <Image src={linkedin} alt="LinkedIn" width={40} height={40} />
+              </a>
             </div>
           </div>
         </div>
