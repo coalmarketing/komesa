@@ -10,4 +10,3 @@ export function createPool(): Pool {
     max: 1,
   });
 }
-
