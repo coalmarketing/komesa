@@ -25,7 +25,7 @@ jobs:
 
       - name: Inject localConnectionString
         run: |
-          sed -i 's|"localConnectionString": "XX"|"localConnectionString": "${{ secrets.HYPERDRIVE_CONNECTION_STRING }}"|' .wrangler.jsonc
+          sed -i 's|"localConnectionString": "XX"|"localConnectionString": "${{ secrets.HYPERDRIVE_CONNECTION_STRING }}"|' wrangler.jsonc
 
       - name: Run deploy
         run: npm run deploy
