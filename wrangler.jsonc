@@ -22,6 +22,7 @@
 		{
 			"binding": "HYPERDRIVE",
 			"id": "333a6a7b9378432a946c7d3da44ba7c6",
+			"localConnectionString": "XX"
 		}
 	]
 	// Secrets (DATABASE_URL, JWT_SECRET) nastav přes: wrangler secret put DATABASE_URL
