@@ -4,18 +4,22 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 export function createPool(): Pool {
   let connectionString: string | undefined;
 
-  // On Cloudflare Workers, HYPERDRIVE binding provides the connection string
   try {
     const { env } = getCloudflareContext();
-    if ((env as any).HYPERDRIVE?.connectionString) {
-      connectionString = (env as any).HYPERDRIVE.connectionString;
+    const hyperdrive = (env as any).HYPERDRIVE;
+    console.log('[db] getCloudflareContext ok, HYPERDRIVE:', hyperdrive ? 'present' : 'missing');
+    if (hyperdrive?.connectionString) {
+      connectionString = hyperdrive.connectionString;
+      console.log('[db] Using Hyperdrive connection string');
     }
-  } catch {
-    // Not running on Cloudflare (local dev with next dev)
+  } catch (e) {
+    console.log('[db] getCloudflareContext failed (local dev?):', String(e));
   }
 
-  // Fallback to DATABASE_URL for local development
-  connectionString ??= process.env.DATABASE_URL;
+  if (!connectionString) {
+    connectionString = process.env.DATABASE_URL;
+    console.log('[db] Using process.env.DATABASE_URL:', connectionString ? 'present' : 'MISSING');
+  }
 
   if (!connectionString) {
     throw new Error('Chybí proměnná DATABASE_URL nebo Hyperdrive binding');
