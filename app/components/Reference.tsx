@@ -84,9 +84,6 @@ const Reference: React.FC<ReferenceProps> = ({ variant = 'primary', limit = 3 })
     const fetchReferences = async () => {
       try {
         console.log('Začátek načítání referencí v komponentě');
-        console.log("proces", process);
-        console.log("env", process.env);
-        console.log("env", getEnv("DATABASE_URL"));
         const response = await fetch('/api/references', {
           headers: {
             'Accept': 'application/json'
