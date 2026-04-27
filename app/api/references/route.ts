@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createPool } from '@/lib/db';
+const { env } = require('node:process');
+
 
 interface Reference {
   id: number;
@@ -61,6 +63,9 @@ const getCorsHeaders = () => {
 
 export async function GET() {
   console.log('Public: Začátek načítání referencí');
+  console.error(process);
+  console.error("env", process.env);
+  console.log("node env", env);
   try {
     // Kontrola, zda je k dispozici DATABASE_URL
     console.log('Kontrola proměnných prostředí:', {
