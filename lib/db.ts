@@ -2,13 +2,24 @@ import { Pool } from 'pg';
 import { getEnv } from './env';
 
 export function createPool(): Pool {
-  const connectionString = getEnv('DATABASE_URL');
+  // On Cloudflare Workers, use Hyperdrive connection string if available
+  let connectionString: string | undefined;
+  try {
+    const { getCloudflareContext } = require('@opennextjs/cloudflare');
+    const { env } = getCloudflareContext();
+    if (env.HYPERDRIVE?.connectionString) {
+      connectionString = env.HYPERDRIVE.connectionString;
+    }
+  } catch {
+    // Not running on Cloudflare
+  }
+  connectionString ??= getEnv('DATABASE_URL');
   if (!connectionString) {
-    throw new Error('Chybí povinná proměnná prostředí DATABASE_URL');
+    throw new Error('Chybí proměnná DATABASE_URL nebo Hyperdrive binding');
   }
   return new Pool({
     connectionString,
-    ssl: { rejectUnauthorized: false },
+    ssl: getEnv('NODE_ENV') !== 'development' ? { rejectUnauthorized: false } : false,
     max: 1,
   });
 }
