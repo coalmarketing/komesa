@@ -8,5 +8,4 @@ bcrypt.hash(password, saltRounds, (err, hash) => {
     console.error('Chyba při generování hashe:', err);
     return;
   }
-  console.log('Hash hesla:', hash);
 }); 

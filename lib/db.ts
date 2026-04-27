@@ -18,7 +18,6 @@ export function createPool(): Pool {
 
   if (!connectionString) {
     connectionString = process.env.DATABASE_URL;
-    console.log('[db] Using process.env.DATABASE_URL:', connectionString ? 'present' : 'MISSING');
   }
 
   if (!connectionString) {
