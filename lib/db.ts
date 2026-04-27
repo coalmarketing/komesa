@@ -1,11 +1,13 @@
 import { Pool } from 'pg';
+import { getEnv } from './env';
 
 export function createPool(): Pool {
-  if (!process.env.DATABASE_URL) {
+  const connectionString = getEnv('DATABASE_URL');
+  if (!connectionString) {
     throw new Error('Chybí povinná proměnná prostředí DATABASE_URL');
   }
   return new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
     ssl: { rejectUnauthorized: false },
     max: 1,
   });

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { validateCredentials, generateToken } from '../auth';
 import { cookies } from 'next/headers';
+import { getEnv } from '@/lib/env';
 
 export async function POST(request: Request) {
   try {
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
       const cookieStore = await cookies();
       cookieStore.set('auth-token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: getEnv('NODE_ENV') === 'production',
         sameSite: 'strict',
         path: '/',
         maxAge: 24 * 60 * 60 // 24 hodin

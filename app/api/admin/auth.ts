@@ -1,14 +1,16 @@
 import { sign, verify } from 'jsonwebtoken';
 import { createPool } from '@/lib/db';
+import { getEnv } from '@/lib/env';
 import bcrypt from 'bcryptjs';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
-// Zajistíme, že JWT_SECRET je vždy definován
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET není definován v .env.local');
+function getJwtSecret(): string {
+  const secret = getEnv('JWT_SECRET');
+  if (!secret) {
+    throw new Error('JWT_SECRET není definován');
+  }
+  return secret;
 }
-
-const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function verifyAuth(cookieStore: ReadonlyRequestCookies) {
   try {
@@ -28,6 +30,7 @@ export async function verifyAuth(cookieStore: ReadonlyRequestCookies) {
 }
 
 export function generateToken(): string {
+  const JWT_SECRET = getJwtSecret();
   console.log('Auth: Generuji token s JWT_SECRET:', JWT_SECRET);
   const token = sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '24h' });
   console.log('Auth: Vygenerovaný token:', token);
@@ -36,6 +39,7 @@ export function generateToken(): string {
 
 export function verifyToken(token: string): boolean {
   try {
+    const JWT_SECRET = getJwtSecret();
     console.log('Auth: Ověřuji token:', token);
     console.log('Auth: Používám JWT_SECRET:', JWT_SECRET);
     const decoded = verify(token, JWT_SECRET);

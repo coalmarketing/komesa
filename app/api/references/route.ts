@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createPool } from '@/lib/db';
+import { getEnv } from '@/lib/env';
 
 
 interface Reference {
@@ -65,11 +66,11 @@ export async function GET() {
   try {
     // Kontrola, zda je k dispozici DATABASE_URL
     console.log('Kontrola proměnných prostředí:', {
-      DATABASE_URL: !!process.env.DATABASE_URL ? 'nastaveno' : 'chybí',
-      NODE_ENV: process.env.NODE_ENV
+      DATABASE_URL: !!getEnv('DATABASE_URL') ? 'nastaveno' : 'chybí',
+      NODE_ENV: getEnv('NODE_ENV')
     });
 
-    if (!process.env.DATABASE_URL) {
+    if (!getEnv('DATABASE_URL')) {
       console.error('Public: Chybí proměnná prostředí DATABASE_URL pro databázi');
       return NextResponse.json(
         { error: 'Chybí konfigurace databáze' },
@@ -90,7 +91,7 @@ export async function GET() {
       return NextResponse.json(
         { 
           error: 'Nelze se připojit k databázi',
-          details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+          details: getEnv('NODE_ENV') === 'development' ? String(error) : undefined
         },
         { 
           status: 500,
@@ -118,7 +119,7 @@ export async function GET() {
       return NextResponse.json(
         { 
           error: 'Chyba při načítání dat z databáze',
-          details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+          details: getEnv('NODE_ENV') === 'development' ? String(error) : undefined
         },
         { 
           status: 500,
@@ -136,7 +137,7 @@ export async function GET() {
     return NextResponse.json(
       { 
         error: 'Neočekávaná chyba při zpracování požadavku',
-        details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+        details: getEnv('NODE_ENV') === 'development' ? String(error) : undefined
       },
       { 
         status: 500,
