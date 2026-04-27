@@ -1,12 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // output: 'standalone' - odstraněno pro Netlify (plugin to zvládne sám)
+
   distDir: '.next',
   generateBuildId: async () => {
     return 'build-' + Date.now()
   },
   images: {
+    unoptimized: true,
     domains: ['dev.ondrejkrejci.com', 'localhost', '127.0.0.1', 'komesa.cz'],
     remotePatterns: [
       {
@@ -27,7 +28,6 @@ const nextConfig = {
       }
     ]
   },
-  assetPrefix: process.env.NODE_ENV === 'production' ? 'https://komesa.cz' : '',
   trailingSlash: true,
   basePath: '',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
@@ -47,4 +47,9 @@ const nextConfig = {
   }
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;
+
+if (process.env.NODE_ENV !== 'production') {
+  const { initOpenNextCloudflareForDev } = require('@opennextjs/cloudflare');
+  initOpenNextCloudflareForDev();
+} 

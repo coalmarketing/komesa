@@ -43,7 +43,7 @@ async function getData() {
 
 export default async function AdminPage() {
   // Ověření přihlášení
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const { isAuthenticated } = await verifyAuth(cookieStore);
 
   // Pokud není přihlášen, předáme prázdná data

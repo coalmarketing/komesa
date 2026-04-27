@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 export async function GET() {
   try {
     console.log('Check-auth: Kontrola autentizace');
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get('auth-token')?.value;
 
     if (!token) {

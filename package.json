@@ -7,12 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "convert-images": "node scripts/convert-images-to-webp.js",
     "convert-images:replace": "node scripts/convert-images-to-webp.js --replace",
     "optimize-images": "node scripts/optimize-images.js"
   },
   "dependencies": {
-    "@netlify/plugin-nextjs": "^5.10.7",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/pg": "^8.11.14",
@@ -21,7 +23,7 @@
     "date-fns": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.0",
-    "next": "^14.2.28",
+    "next": "^15.5.15",
     "pg": "^8.15.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -29,12 +31,14 @@
     "sharp": "^0.33.5"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "latest",
     "@types/node": "^20.2.5",
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "wrangler": "latest"
   }
 }

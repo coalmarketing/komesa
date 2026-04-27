@@ -1,5 +1,5 @@
 import { sign, verify } from 'jsonwebtoken';
-import pool from '@/lib/db';
+import { createPool } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
@@ -51,6 +51,7 @@ export async function validateCredentials(username: string, password: string): P
   console.log('Auth: Validace credentials pro uživatele:', username);
   
   try {
+    const pool = createPool();
     const client = await pool.connect();
     try {
       const result = await client.query(
@@ -80,6 +81,7 @@ export async function changePassword(username: string, currentPassword: string, 
   console.log('Auth: Změna hesla pro uživatele:', username);
   
   try {
+    const pool = createPool();
     const client = await pool.connect();
     try {
       // Nejprve ověříme aktuální heslo

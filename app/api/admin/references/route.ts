@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { createPool } from '@/lib/db';
 import { cookies } from 'next/headers';
 import { verifyAuth } from '../auth';
 
@@ -17,7 +17,7 @@ export async function GET() {
   console.log('Admin: Začátek načítání referencí');
   try {
     // Ověření autentizace
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const authResult = await verifyAuth(cookieStore);
     
     if (!authResult.isAuthenticated) {
@@ -29,6 +29,7 @@ export async function GET() {
     }
 
     console.log('Admin: Získávání připojení k databázi');
+    const pool = createPool();
     const client = await pool.connect();
     try {
       console.log('Admin: Načítání všech referencí');

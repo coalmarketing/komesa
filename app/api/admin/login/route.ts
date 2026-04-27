@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       const token = generateToken();
       
       // Nastavíme token do HTTP-only cookies
-      const cookieStore = cookies();
+      const cookieStore = await cookies();
       cookieStore.set('auth-token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

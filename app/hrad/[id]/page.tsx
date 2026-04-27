@@ -5,8 +5,9 @@ import HradDetail from "../../components/HradDetail";
 import BackToHome from "../../components/BackToHome";
 import { hrady } from "../../data/hrady";
 
-export default function HradPage({ params }: { params: { id: string } }) {
-  const id = parseInt(params.id);
+export default async function HradPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: idStr } = await params;
+  const id = parseInt(idStr);
   
   // Najít hrad podle ID
   const hrad = hrady.find(h => h.id === id);

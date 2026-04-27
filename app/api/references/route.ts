@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { createPool } from '@/lib/db';
 
 interface Reference {
   id: number;
@@ -82,6 +82,7 @@ export async function GET() {
     console.log('Public: Získávání připojení k databázi');
     let client;
     try {
+      const pool = createPool();
       client = await pool.connect();
     } catch (error) {
       console.error('Public: Chyba při připojení k databázi:', error);
@@ -163,6 +164,7 @@ export async function POST(request: Request) {
     }
 
     console.log('Public: Získávání připojení k databázi');
+    const pool = createPool();
     const client = await pool.connect();
     try {
       console.log('Public: Provádění SQL dotazu pro vložení');

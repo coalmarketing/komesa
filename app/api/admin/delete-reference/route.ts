@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { createPool } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
     const { id } = await request.json();
 
     console.log('Admin: Získávání připojení k databázi pro smazání reference');
+    const pool = createPool();
     const client = await pool.connect();
     try {
       console.log('Admin: Provádění SQL dotazu pro smazání');
