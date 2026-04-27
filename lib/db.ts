@@ -1,25 +1,29 @@
 import { Pool } from 'pg';
-import { getEnv } from './env';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 export function createPool(): Pool {
-  // On Cloudflare Workers, use Hyperdrive connection string if available
   let connectionString: string | undefined;
+
+  // On Cloudflare Workers, HYPERDRIVE binding provides the connection string
   try {
-    const { getCloudflareContext } = require('@opennextjs/cloudflare');
     const { env } = getCloudflareContext();
-    if (env.HYPERDRIVE?.connectionString) {
-      connectionString = env.HYPERDRIVE.connectionString;
+    if ((env as any).HYPERDRIVE?.connectionString) {
+      connectionString = (env as any).HYPERDRIVE.connectionString;
     }
   } catch {
-    // Not running on Cloudflare
+    // Not running on Cloudflare (local dev with next dev)
   }
-  connectionString ??= getEnv('DATABASE_URL');
+
+  // Fallback to DATABASE_URL for local development
+  connectionString ??= process.env.DATABASE_URL;
+
   if (!connectionString) {
     throw new Error('Chybí proměnná DATABASE_URL nebo Hyperdrive binding');
   }
+
   return new Pool({
     connectionString,
-    ssl: getEnv('NODE_ENV') !== 'development' ? { rejectUnauthorized: false } : false,
+    ssl: { rejectUnauthorized: false },
     max: 1,
   });
 }
