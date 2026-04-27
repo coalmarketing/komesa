@@ -6,6 +6,7 @@ import Button from './Button';
 import { formatDistanceToNow } from 'date-fns';
 import { cs } from 'date-fns/locale';
 import google from '@/public/icons/google-white.svg';
+import { getEnv } from '@/lib/env';
 
 interface Reference {
   id: number;
@@ -85,6 +86,7 @@ const Reference: React.FC<ReferenceProps> = ({ variant = 'primary', limit = 3 })
         console.log('Začátek načítání referencí v komponentě');
         console.log("proces", process);
         console.log("env", process.env);
+        console.log("env", getEnv("DATABASE_URL"));
         const response = await fetch('/api/references', {
           headers: {
             'Accept': 'application/json'
